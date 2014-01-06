@@ -26,6 +26,8 @@ class GameWindow < Gosu::Window
     @player.speed_start(@start_speed)
     @enemy = Enemy.new(self)
     @enemy.warp(400, 40)
+    @enemy_speed = 0.75
+    @enemy.speed_start(@enemy_speed)
     @font = Gosu::Font.new(self, Gosu::default_font_name, 20)
     @slow_down_sound = Gosu::Sample.new(self, "lib/sounds/slow_down_sound.wav")
     @button_sound = Gosu::Sample.new(self, "lib/sounds/button_sound.wav")
@@ -56,6 +58,7 @@ class GameWindow < Gosu::Window
     end
     @enemy.move
     @bullet.move
+    @enemy.follow(@player.x, @player.y)
     #@bullet.warp(@player.x, @player.y)
   	if button_down? Gosu::KbRight then
   		#@player.turn_right
@@ -185,12 +188,12 @@ class GameWindow < Gosu::Window
   			close
   		end
   	end
-  	if rand(100) >= 50 then
-  		@enemy.turn_left
-  	end
-  	if rand(10000) < 750 then
-  		@enemy.turn_up
-  	end
+  	#if rand(100) >= 50 then
+  	#	@enemy.turn_left
+  	#end
+  	#if rand(10000) < 750 then
+  	#	@enemy.turn_up
+  	#end
   end
 
   def draw
@@ -381,7 +384,7 @@ class Enemy
     @lives = 0
     @level = 0
     @vy = 0
-    @speed = 5
+    @speed = 0.8
   end
 
   def x
@@ -390,6 +393,23 @@ class Enemy
 
   def y
     @y
+  end
+
+  def follow(x, y)
+    if Gosu::distance(@x, @y, x, y) < 250 then
+    if @x < x then
+      @x += @speed
+    end
+    if @x > x then
+      @x -= @speed
+    end
+    if @y < y then
+      @y += @speed
+    end
+    if @y > y then
+      @y -= @speed
+    end
+  end
   end
 
   def level
